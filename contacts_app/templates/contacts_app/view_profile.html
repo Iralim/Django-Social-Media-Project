@@ -1,0 +1,114 @@
+{% extends "base.html" %} 
+{% block title %}Show Profile{% endblock %} 
+{% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <h2 class="py-4">User Profile</h2>
+
+          <img
+            src="{{ user_info.profile.profile_pic_url }}"
+            alt="Profile Picture"
+            class="rounded-circle mb-3"
+            style="width: 120px; height: 120px; object-fit: cover"
+          />
+
+          <p class="text-muted m-0" style="font-size: 14px">Username</p>
+          <h2 class="card-title text-primary mb-0">
+            {{ user_info.user.username }}
+          </h2>
+
+          <div class="text-start py-2">
+            <div class="d-flex gap-4 border-bottom pb-2">
+              <strong>Joined:</strong>
+              <span class="text-muted ms-1">
+                {{ user_info.user.date_joined }}
+              </span>
+            </div>
+
+            <div class="d-flex gap-4 border-bottom py-2">
+              <strong>Gender:</strong>
+              <span class="text-muted">
+                {% if user_info.profile.gender == "M" %} 
+                Male 
+                {% else %} 
+                Female 
+                {% endif %}
+              </span>
+            </div>
+
+            <div class="d-flex gap-4 border-bottom py-2">
+              <strong>Age:</strong>
+              <span class="text-muted ms-4">{{ user_info.profile.age }}</span>
+            </div>
+          </div>
+
+          <!-- Friendship status =====================-->
+          {% if user_info.friendship_status == 'pending' %}
+            <div>
+                <form method="post" action="{% url 'contacts_app:cancel_friend_request' user_info.user.id %}">
+                {% csrf_token %}
+                Friend request: <span style="color: orange;">{{ user_info.friendship_status }}</span>
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="btn btn-warning mt-3 mb-2 w-100" type="submit">Cancel Request</button>
+                </form>
+            </div>
+          {% elif user_info.friendship_status == 'requested' %}
+            <div>
+              <span style="color: green;">Sends you a friend request</span>
+          
+              <div class="btn-group mt-3 mb-2 w-100 gap-2">
+                  <form method="post" action="{% url 'contacts_app:accept_request' user_info.request_id %}" style="display: inline-block; width: 50%;">
+                      {% csrf_token %}
+                      <input type="hidden" name="next" value="{{ request.path }}">
+                      <button class="btn btn-success w-100" type="submit">Accept</button>
+                  </form>
+                  
+                  <form method="post" action="{% url 'contacts_app:reject_request' user_info.request_id %}" style="display: inline-block; width: 50%;">
+                      {% csrf_token %}
+                      <input type="hidden" name="next" value="{{ request.path }}">
+                      <button class="btn btn-danger w-100" type="submit">Reject</button>
+                  </form>
+              </div>
+            </div>
+          {% elif user_info.is_friend %}
+            <div class="btn-group mt-3  w-100 gap-2" >
+              <form method="POST" style="display: inline-block; width: 50%;">
+                {% csrf_token %}
+                <button class="btn btn-primary  mb-2 w-100" type="submit" disabled>Send Message</button>
+              </form>
+
+              <form method="POST" action="{% url 'contacts_app:remove_friend' user_info.user.id %}" style="display: inline-block; width: 50%;">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="btn btn-danger  mb-2 w-100" type="submit">Remove Friend</button>
+              </form>
+            </div>       
+
+            
+           
+          {% else %}
+            <div>
+                <form method="post" action="{% url 'contacts_app:send_request' user_info.user.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button class="btn btn-primary mt-3 mb-2 w-100" type="submit">Add to Friends</button>
+                    
+                </form>
+            </div>
+          {% endif %}
+    
+          <div class="">
+            <a href="{% url 'posts_app:all_posts' %}" class="btn btn-outline-primary w-100">
+              Back
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

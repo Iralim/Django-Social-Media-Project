@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-primary-subtle shadow-sm py-2">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">Logo</a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.resolver_match.url_name == 'all_posts' %}active{% endif %}"
+                href="{% url 'posts_app:all_posts' %}"
+                >All Posts</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.resolver_match.url_name == 'my_posts' %}active{% endif %}"
+                href="{% url 'posts_app:my_posts' %}"
+                >My Posts</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.resolver_match.url_name == 'posts_commented' %}active{% endif %}"
+                href="{% url 'posts_app:posts_commented' %}"
+                >My Reactions</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
+                href="{% url 'profile_app:profile' %}"
+                >My Profile</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'view_friends' %}active{% endif %}" 
+              href="{% url 'contacts_app:view_friends' %}">
+                Friends{% if friend_requests_count > 0 %} ({{ friend_requests_count }}){% endif %}
+            </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'view_users' %}active{% endif %}"
+               href="{% url 'contacts_app:view_users' %}">
+                Users
+              </a>
+            </li>
+
+          </ul>
+
+          <div class="d-flex justify-content-between align-items-center gap-3">
+            <div class="d-flex gap-2 align-items-center">
+              <img
+                src="{{ profile.profile_pic.url }}"
+                width="40"
+                height="40"
+                alt="User"
+                class="rounded-circle border"
+                loading="eager"
+              />
+              <span class="fw-semibold">{{ user.username }}</span>
+            </div>
+
+            <a
+              href="{% url 'users:logout' %}"
+              class="btn btn-sm btn-danger d-flex align-items-center gap-1"
+            >
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div
+      class="container align-items-center flex-column gap-2 d-flex justify-content-center mt-4"
+    >
+      {% block content %} {% endblock %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

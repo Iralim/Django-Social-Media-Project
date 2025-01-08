@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load return_item %}
+
+{% block title %}New Post{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="text-center mb-4">Update Post</h1>
+            <form method="POST" enctype="multipart/form-data" class=" bg-white">
+                {% csrf_token %}
+                
+                    {{ form.as_p }}
+      
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{% url 'posts_app:my_posts' %}" class="btn btn-outline-primary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

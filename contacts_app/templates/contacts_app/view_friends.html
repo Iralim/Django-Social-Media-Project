@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %} Friends {% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  {% if users_info_list %}
+    <div class="row">
+      {% for user_info in users_info_list %}
+        <div class="col-12 col-md-6 col-lg-4 mb-4"> 
+          <div class="card shadow-sm">
+            <div class="card-body text-center">
+   
+              <img
+                src="{{ user_info.profile.profile_pic_url }}"
+                alt="Profile Picture"
+                class="rounded-circle mb-3"
+                style="width: 80px; height: 80px; object-fit: cover"
+              />
+
+
+              <h2 class="card-title text-primary text-capitalize mb-0">
+                <a style="text-decoration: none;" href="{% url 'contacts_app:view_profile' user_info.user.id %}">{{ user_info.user.username }}</a>
+              </h2>
+
+
+              {% if user_info.friendship_status == 'requested' %}
+                <div>
+                  <span style="color:green">Sends you a friend request</span>
+
+                  <div class="btn-group mt-3 mb-2 w-100 gap-2">
+                    <form method="post" action="{% url 'contacts_app:accept_request' user_info.request_id %}" style="display: inline-block; width: 50%;">
+                      {% csrf_token %}
+                      <input type="hidden" name="next" value="{{ request.path }}">
+                      <button class="btn btn-success w-100" type="submit">Accept</button>
+                    </form>
+
+                    <form method="post" action="{% url 'contacts_app:reject_request' user_info.request_id %}" style="display: inline-block; width: 50%;">
+                      {% csrf_token %}
+                      <input type="hidden" name="next" value="{{ request.path }}">
+                      <button class="btn btn-danger w-100" type="submit">Reject</button>
+                    </form>
+                  </div>
+                </div>
+
+              {% elif user_info.is_friend %}
+              <span style="color: transparent;">....</span>
+
+                <div class="btn-group mt-3 mb-2 w-100 gap-2">
+                  
+                  <form method="POST" style="display: inline-block; width: 50%;">
+                    {% csrf_token %}
+                    <button class="btn btn-primary w-100" type="submit" disabled> Message</button>
+                  </form>
+                  <form method="POST" style="display: inline-block; width: 50%;" action="{% url 'contacts_app:remove_friend' user_info.user.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button class="btn btn-danger  w-100" type="submit">Remove </button>
+                  </form>
+                </div>
+
+                <div>
+                  
+                </div>
+
+              {% endif %}
+              
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center" role="alert">
+      <i class="fas fa-info-circle me-2"></i>
+      No friends to display
+    </div>
+  {% endif %}
+  <div class=" text-center">
+    <a href="{% url 'posts_app:all_posts' %}" class="btn w-25 btn-secondary 0">
+      Back
+    </a>
+  </div> 
+</div>
+{% endblock %}
+

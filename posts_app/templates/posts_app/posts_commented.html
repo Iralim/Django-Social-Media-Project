@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load return_item %}
+{% load social_share %}
+{% block title %}My reactions{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 col-xl-8 mx-auto">
+            {% if posts %}
+                {% for post in posts %}
+                <a class="btn" href="#post_{{post.id}}"></a>
+                <div id="post_{{post.id}}" class="card mb-4 shadow-sm">
+                    <div class="card-header bg-white d-flex align-items-center gap-3 py-3">
+                        <img src="{{ post.author.profile.profile_pic_url }}" 
+                             class="rounded-circle border border-2 border-primary" 
+                             alt="User" 
+                             style="object-fit: cover; width: 60px; height: 60px;">
+                        <div>
+                            <a style="text-decoration: none;" href="{% url 'contacts_app:view_profile' post.author.id %}"><h6 class="mb-1 text-capitalize fw-bold">{{ post.author }}</h6>
+                            <small class="text-muted">{{ post.date|date:"F d, Y" }}</small>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="card-title mb-3">
+                            <a href="{% url 'posts_app:page' slug=post.slug %}" 
+                               class="text-dark text-decoration-none">{{ post.title }}</a>
+                        </h4>
+
+                        <a href="{% url 'posts_app:page' slug=post.slug %}" 
+                           class="text-decoration-none text-dark">
+                            <p class="card-text text-muted mb-3">
+                                {{ post.body|truncatewords:30 }}
+                            </p>
+                        </a>
+
+                        {% if post.image %}
+                        <a href="{% url 'posts_app:page' slug=post.slug %}" class="d-block mb-3">
+                            <img src="{{ post.image.url }}" 
+                                 class="img-fluid rounded-3 shadow-sm" 
+                                 alt="{{ post.title }}">
+                        </a>
+                        {% endif %}
+
+                        <hr class="my-3">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-2 text-muted">
+                                <i class="fas fa-thumbs-up text-primary"></i>
+                                <small>{{ num_likes|return_item:forloop.counter }} Likes</small>
+                            </div>
+                            <div>
+                                <a href="{% url 'posts_app:page' slug=post.slug %}" 
+                                   class="text-muted text-decoration-none">
+                                    <small>
+                                        {{ num_comments|return_item:forloop.counter }} Comments
+                                    </small>
+                                </a>
+                            </div>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <div class="d-flex gap-2">
+                            <form action="{% url 'posts_app:like_commented' post.id %}" method="post">
+                                {% csrf_token %}
+                            <button type="submit" class="btn btn-light text-muted btn-sm d-flex align-items-center gap-2">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span>Like</span>
+                            </button>
+                            </form>
+                            <a href="{% url 'posts_app:page' slug=post.slug %}" 
+                               class="btn btn-light text-muted btn-sm d-flex align-items-center gap-2">
+                                <i class="fas fa-comment"></i>
+                                <span>Comment</span>
+                            </a>
+                            <button class="btn btn-light text-muted  btn-sm d-flex align-items-center gap-2">
+                                <i class="fas fa-share-alt"></i>
+                                <!--<span><a style="text-decoration: none; color:gray" href="https://www.facebook.com/sharer/sharer.php?u={{request.build_absolute_uri}}">
+                                    Facebook</a></span>-->
+                                <span>{% post_to_facebook object_or_url "Facebook" %}</span>
+                            </button>
+                            <!--<button class="btn btn-light text-muted  btn-sm d-flex align-items-center gap-2">
+                                <i class="fas fa-share-alt"></i>
+                                <span><a style="text-decoration: none; color:gray" href="https://twitter.com/home?status=I'm%20going%20to%20learn%20to%20Code...%20Come%20build%20an%20web%20apsp%20with%20me!%20%23CFE%20and%20@justinmitchel%20{{request.build_absolute_uri}}">
+                                    X</a></span>
+                                <span>{% post_to_twitter "{{post.title}} {{post.body}}" object_or_url "X" %}</span>
+                            </button>-->
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info text-center" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No posts to display
+                </div>
+            {% endif %}
+
+            {% if posts.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if posts.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in posts.paginator.page_range %}
+                        {% if posts.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if posts.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.next_page_number }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
